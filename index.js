@@ -222,156 +222,8 @@ export default () => {
 
   rootScene.add(streetMesh);
   streetMesh.position.set(0, -1/2, 0);
+  streetMesh.updateMatrix();
   streetMesh.updateMatrixWorld();
-  /* const ui = useUi();
-  const w = 4;
-  const popoverWidth = 600; // XXX
-  const popoverHeight = 200;
-  const popoverTarget = new THREE.Object3D();
-  popoverTarget.position.set(6, 2, -4);
-  const popoverTextMesh = (() => {
-    const textMesh = ui.makeTextMesh('Multiplayer hub.\n[E] to enter', undefined, 0.5, 'center', 'middle');
-    textMesh.position.z = 0.1;
-    textMesh.scale.x = popoverHeight / popoverWidth;
-    textMesh.color = 0xFFFFFF;
-    return textMesh;
-  })();
-  const popoverMesh = ui.makePopoverMesh(popoverTextMesh, {
-    width: popoverWidth,
-    height: popoverHeight,
-    target: popoverTarget,
-  }); */
-
-  /* function mod(a, n) {
-    return ((a%n)+n)%n;
-  }
-  const floorMesh = (() => {
-    const dims = [100, 500];
-    const dims2P1 = dims.map(n => 2*n+1);
-    const planeBufferGeometry = new THREE.PlaneBufferGeometry(1, 1)
-      .applyMatrix4(localMatrix.makeScale(0.95, 0.95, 1))
-      .applyMatrix4(localMatrix.makeRotationFromQuaternion(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI/2)))
-      // .applyMatrix4(localMatrix.makeTranslation(0, 0.1, 0))
-      .toNonIndexed();
-    const numCoords = planeBufferGeometry.attributes.position.array.length;
-    const numVerts = numCoords/3;
-    const positions = new Float32Array(numCoords*dims2P1[0]*dims2P1[1]);
-    const centers = new Float32Array(numCoords*dims2P1[0]*dims2P1[1]);
-    const typesx = new Float32Array(numVerts*dims2P1[0]*dims2P1[1]);
-    const typesz = new Float32Array(numVerts*dims2P1[0]*dims2P1[1]);
-    let i = 0;
-    for (let x = -dims[0]; x <= dims[0]; x++) {
-      for (let z = -dims[1]; z <= dims[1]; z++) {
-        const newPlaneBufferGeometry = planeBufferGeometry.clone()
-          .applyMatrix4(localMatrix.makeTranslation(x, 0, z));
-        positions.set(newPlaneBufferGeometry.attributes.position.array, i * newPlaneBufferGeometry.attributes.position.array.length);
-        for (let j = 0; j < newPlaneBufferGeometry.attributes.position.array.length/3; j++) {
-          localVector.set(x, 0, z).toArray(centers, i*newPlaneBufferGeometry.attributes.position.array.length + j*3);
-        }
-        let typex = 0;
-        if (mod((x + parcelSize/2), parcelSize) === 0) {
-          typex = 1/8;
-        } else if (mod((x + parcelSize/2), parcelSize) === parcelSize-1) {
-          typex = 2/8;
-        }
-        let typez = 0;
-        if (mod((z + parcelSize/2), parcelSize) === 0) {
-          typez = 1/8;
-        } else if (mod((z + parcelSize/2), parcelSize) === parcelSize-1) {
-          typez = 2/8;
-        }
-        for (let j = 0; j < numVerts; j++) {
-          typesx[i*numVerts + j] = typex;
-          typesz[i*numVerts + j] = typez;
-        }
-        i++;
-      }
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('center', new THREE.BufferAttribute(centers, 3));
-    geometry.setAttribute('typex', new THREE.BufferAttribute(typesx, 1));
-    geometry.setAttribute('typez', new THREE.BufferAttribute(typesz, 1));
-    const floorVsh = `
-      #define PI 3.1415926535897932384626433832795
-      uniform float uAnimation;
-      attribute vec3 center;
-      attribute float typex;
-      attribute float typez;
-      varying vec3 vPosition;
-      varying float vTypex;
-      varying float vTypez;
-      varying float vDepth;
-
-      float range = 1.0;
-
-      void main() {
-        float animationRadius = uAnimation * 10.;
-        float currentRadius = length(center.xz - cameraPosition.xz);
-        float radiusDiff = abs(animationRadius - currentRadius);
-        float height = max((range - radiusDiff)/range, 0.0);
-        height = sin(height*PI/2.0);
-        height *= 0.2;
-        // height = 0.0;
-        vec3 p = vec3(position.x, position.y + height, position.z);
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.);
-        vPosition = position + vec3(0.5, 0.0, 0.5);
-        vTypex = typex;
-        vTypez = typez;
-        vDepth = gl_Position.z / 30.0;
-      }
-    `;
-    const floorFsh = `
-      uniform vec4 uCurrentParcel;
-      uniform vec4 uHoverParcel;
-      uniform vec4 uSelectedParcel;
-      uniform vec3 uSelectedColor;
-      // uniform float uAnimation;
-      varying vec3 vPosition;
-      varying float vTypex;
-      varying float vTypez;
-      varying float vDepth;
-      void main() {
-        vec3 c = vec3(${new THREE.Color(0xCCCCCC).toArray().join(', ')});
-        float a = (1.0-vDepth)*0.5;
-        gl_FragColor = vec4(c, a);
-      }
-    `;
-    const material = new THREE.ShaderMaterial({
-      uniforms: {
-        uCurrentParcel: {
-          type: 'v4',
-          value: new THREE.Vector4(),
-        },
-        uHoverParcel: {
-          type: 'v4',
-          value: new THREE.Vector4(),
-        },
-        uSelectedParcel: {
-          type: 'v4',
-          value: new THREE.Vector4(-8, -8, 8, 8),
-        },
-        uSelectedColor: {
-          type: 'c',
-          value: new THREE.Color().setHex(0x5c6bc0),
-        },
-        uAnimation: {
-          type: 'f',
-          value: 0,
-        },
-      },
-      vertexShader: floorVsh,
-      fragmentShader: floorFsh,
-      transparent: true,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.frustumCulled = false;
-    // mesh.castShadow = true;
-    // mesh.receiveShadow = true;
-    return mesh;
-  })();
-  floorMesh.position.set(0, -0.02, 0);
-  rootScene.add(floorMesh); */
 
   const stacksBoundingBox = new THREE.Box2(
     new THREE.Vector2(5, 0),
@@ -518,7 +370,7 @@ export default () => {
 
   rootScene.add(gridMesh);
   gridMesh.position.set(0, -0.01, 0);
-  // gridMesh.matrixWorldNeedsUpdate=true;
+  gridMesh.updateMatrix();
   gridMesh.updateMatrixWorld();
   const particlesMesh = (() => {
     const numParticles = 30000;
