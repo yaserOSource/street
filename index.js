@@ -202,6 +202,7 @@ export default () => {
 
   rootScene.add(streetMesh);
   streetMesh.matrix.setPosition(0, -1/2, 0);
+  streetMesh.updateMatrix();
   streetMesh.matrixAutoUpdate = false;
 
   const stacksBoundingBox = new THREE.Box2(
