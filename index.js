@@ -12,15 +12,6 @@ export default () => {
   const width = 10;
   const height = 10;
   const depth = 10;
-  // const colorTargetSize = 64;
-  // const voxelSize = 0.1;
-  // const marchCubesTexSize = 2048;
-  // const fov = 90;
-  // const aspect = 1;
-  // const raycastNear = 0.1;
-  // const raycastFar = 100;
-  // const raycastDepth = 3;
-  // const walkSpeed = 0.0015;
   const streetSize = new THREE.Vector3(10, 1, 1000);
 
   const zeroVector = new THREE.Vector3(0, 0, 0);
@@ -33,19 +24,8 @@ export default () => {
   const localQuaternion = new THREE.Quaternion();
   const localEuler = new THREE.Euler();
   const localMatrix = new THREE.Matrix4();
-  // const gltfLoader = new GLTFLoader();
-  // const textureLoader = new THREE.TextureLoader();
 
   const rootScene = new THREE.Object3D();
-  // app.object.add(rootScene);
-
-  /* const ambientLight = new THREE.AmbientLight(0xFFFFFF);
-  rootScene.add(ambientLight);
-  // rootScene.ambientLight = ambientLight;
-  const directionalLight = new THREE.DirectionalLight(0xFFFFFF);
-  directionalLight.position.set(1, 2, 3);
-  rootScene.add(directionalLight);
-  // rootScene.directionalLight = directionalLight; */
 
   class MultiSimplex {
     constructor(seed, octaves) {
@@ -221,9 +201,8 @@ export default () => {
   })();
 
   rootScene.add(streetMesh);
-  streetMesh.position.set(0, -1/2, 0);
-  streetMesh.updateMatrix();
-  streetMesh.updateMatrixWorld();
+  streetMesh.matrix.setPosition(0, -1/2, 0);
+  streetMesh.matrixAutoUpdate = false;
 
   const stacksBoundingBox = new THREE.Box2(
     new THREE.Vector2(5, 0),
