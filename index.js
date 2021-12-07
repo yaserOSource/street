@@ -12,6 +12,15 @@ export default () => {
   const width = 10;
   const height = 10;
   const depth = 10;
+  // const colorTargetSize = 64;
+  // const voxelSize = 0.1;
+  // const marchCubesTexSize = 2048;
+  // const fov = 90;
+  // const aspect = 1;
+  // const raycastNear = 0.1;
+  // const raycastFar = 100;
+  // const raycastDepth = 3;
+  // const walkSpeed = 0.0015;
   const streetSize = new THREE.Vector3(10, 1, 1000);
 
   const zeroVector = new THREE.Vector3(0, 0, 0);
@@ -24,8 +33,19 @@ export default () => {
   const localQuaternion = new THREE.Quaternion();
   const localEuler = new THREE.Euler();
   const localMatrix = new THREE.Matrix4();
+  // const gltfLoader = new GLTFLoader();
+  // const textureLoader = new THREE.TextureLoader();
 
   const rootScene = new THREE.Object3D();
+  // app.object.add(rootScene);
+
+  /* const ambientLight = new THREE.AmbientLight(0xFFFFFF);
+  rootScene.add(ambientLight);
+  // rootScene.ambientLight = ambientLight;
+  const directionalLight = new THREE.DirectionalLight(0xFFFFFF);
+  directionalLight.position.set(1, 2, 3);
+  rootScene.add(directionalLight);
+  // rootScene.directionalLight = directionalLight; */
 
   class MultiSimplex {
     constructor(seed, octaves) {
@@ -201,7 +221,7 @@ export default () => {
   })();
 
   rootScene.add(streetMesh);
-  streetMesh.matrix.setPosition(0, -1/2, 0);
+  streetMesh.position.set(0, -1/2, 0);
   streetMesh.updateMatrix();
   streetMesh.updateMatrixWorld();
 
@@ -352,7 +372,6 @@ export default () => {
   gridMesh.position.set(0, -0.01, 0);
   gridMesh.updateMatrix();
   gridMesh.updateMatrixWorld();
-  
   const particlesMesh = (() => {
     const numParticles = 30000;
     const s = 0.1;
@@ -535,7 +554,62 @@ export default () => {
     new THREE.Vector3(streetSize.z, 2000, streetSize.z).multiplyScalar(0.5),
     false
   );
+  /* app.addEventListener('unload', () => {
+    physics.removeGeometry(physicsId);
+  }); */
 
+  /* let beat = false;
+  let beatReady = false;
+  const listener = new THREE.AudioListener();
+  rootScene.add(listener);
+  const sound = new THREE.Audio(listener);
+  new THREE.AudioLoader().load(`https://avaer.github.io/assets-private/mnleo.mp3`, function( buffer ) {
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    // sound.setVolume(0.5);
+    // sound.play();
+    beatReady = true;
+  });
+  const analyser = new THREE.AudioAnalyser(sound, 32);
+  const _keydown = e => {
+    switch (e.which) {
+      case 77: { // M
+        if (beatReady) {
+          beat = !beat;
+          if (beat) {
+            sound.play();
+          } else {
+            sound.pause();
+          }
+        }
+        break;
+      }
+    }
+  };
+  window.addEventListener('keydown', _keydown);
+  app.addEventListener('unload', () => {
+    window.removeEventListener('keydown', _keydown);
+  }); */
+
+  /* appManager.addEventListener('use', () => {
+    universe.enterWorld({
+      objects: [
+        {
+          position: [-3, 0, -10],
+          contentId: 'https://avaer.github.io/shield/index.js',
+        },
+      ],
+      extents: [
+        portalMesh.boundingBox.min.toArray(),
+        portalMesh.boundingBox.max.toArray(),
+      ],
+    });
+    // rootScene.visible = !rootScene.visible;
+  }); */
+
+  /* app.addEventListener('activate', e => {
+    console.log('got activate event', e, e.waitUntil);
+  }); */
 
   useFrame(({timestamp}) => {
     // const transforms = rig.getRigTransforms();
@@ -547,6 +621,24 @@ export default () => {
     // floorMesh.material.uniforms.uAnimation.value = (now%2000)/2000;
     particlesMesh.material.uniforms.uColor.value = f;
     particlesMesh.material.uniforms.uTime.value = (timestamp%10000)/10000;
+
+    /* if (beat) {
+      const fd = analyser.getFrequencyData();
+      const v = fd[4];
+      const beatValue = Math.min(v/255, 1);
+      const beatValue2 = Math.min(v/255, 1);
+      streetMesh.material.uniforms.uBeat.value = beatValue;
+      gridMesh.material.uniforms.uBeat.value = beatValue;
+      gridMesh.material.uniforms.uBeat2.value = beatValue2;
+      particlesMesh.material.uniforms.uBeat.value = beatValue;
+      particlesMesh.material.uniforms.uBeat2.value = beatValue2;
+    } else {
+      streetMesh.material.uniforms.uBeat.value = 1;
+      gridMesh.material.uniforms.uBeat.value = 1;
+      gridMesh.material.uniforms.uBeat2.value = 0;
+      particlesMesh.material.uniforms.uBeat.value = 1;
+      particlesMesh.material.uniforms.uBeat2.value = 0;
+    } */
   });
   
   useCleanup(() => {
