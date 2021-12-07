@@ -369,7 +369,7 @@ export default () => {
 
 
   rootScene.add(gridMesh);
-  gridMesh.position.set(0, -23.01, 0);
+ gridMesh.position.set(0, -0.01, 0);
   gridMesh.updateMatrix();
   gridMesh.updateMatrixWorld();
   const particlesMesh = (() => {
