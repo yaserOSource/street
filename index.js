@@ -203,7 +203,7 @@ export default () => {
   rootScene.add(streetMesh);
   streetMesh.matrix.setPosition(0, -1/2, 0);
   streetMesh.updateMatrix();
-  streetMesh.matrixAutoUpdate = false;
+  streetMesh.updateMatrixWorld();
 
   const stacksBoundingBox = new THREE.Box2(
     new THREE.Vector2(5, 0),
@@ -352,6 +352,7 @@ export default () => {
   gridMesh.position.set(0, -0.01, 0);
   gridMesh.updateMatrix();
   gridMesh.updateMatrixWorld();
+  
   const particlesMesh = (() => {
     const numParticles = 30000;
     const s = 0.1;
@@ -534,62 +535,7 @@ export default () => {
     new THREE.Vector3(streetSize.z, 2000, streetSize.z).multiplyScalar(0.5),
     false
   );
-  /* app.addEventListener('unload', () => {
-    physics.removeGeometry(physicsId);
-  }); */
 
-  /* let beat = false;
-  let beatReady = false;
-  const listener = new THREE.AudioListener();
-  rootScene.add(listener);
-  const sound = new THREE.Audio(listener);
-  new THREE.AudioLoader().load(`https://avaer.github.io/assets-private/mnleo.mp3`, function( buffer ) {
-    sound.setBuffer(buffer);
-    sound.setLoop(true);
-    // sound.setVolume(0.5);
-    // sound.play();
-    beatReady = true;
-  });
-  const analyser = new THREE.AudioAnalyser(sound, 32);
-  const _keydown = e => {
-    switch (e.which) {
-      case 77: { // M
-        if (beatReady) {
-          beat = !beat;
-          if (beat) {
-            sound.play();
-          } else {
-            sound.pause();
-          }
-        }
-        break;
-      }
-    }
-  };
-  window.addEventListener('keydown', _keydown);
-  app.addEventListener('unload', () => {
-    window.removeEventListener('keydown', _keydown);
-  }); */
-
-  /* appManager.addEventListener('use', () => {
-    universe.enterWorld({
-      objects: [
-        {
-          position: [-3, 0, -10],
-          contentId: 'https://avaer.github.io/shield/index.js',
-        },
-      ],
-      extents: [
-        portalMesh.boundingBox.min.toArray(),
-        portalMesh.boundingBox.max.toArray(),
-      ],
-    });
-    // rootScene.visible = !rootScene.visible;
-  }); */
-
-  /* app.addEventListener('activate', e => {
-    console.log('got activate event', e, e.waitUntil);
-  }); */
 
   useFrame(({timestamp}) => {
     // const transforms = rig.getRigTransforms();
@@ -601,24 +547,6 @@ export default () => {
     // floorMesh.material.uniforms.uAnimation.value = (now%2000)/2000;
     particlesMesh.material.uniforms.uColor.value = f;
     particlesMesh.material.uniforms.uTime.value = (timestamp%10000)/10000;
-
-    /* if (beat) {
-      const fd = analyser.getFrequencyData();
-      const v = fd[4];
-      const beatValue = Math.min(v/255, 1);
-      const beatValue2 = Math.min(v/255, 1);
-      streetMesh.material.uniforms.uBeat.value = beatValue;
-      gridMesh.material.uniforms.uBeat.value = beatValue;
-      gridMesh.material.uniforms.uBeat2.value = beatValue2;
-      particlesMesh.material.uniforms.uBeat.value = beatValue;
-      particlesMesh.material.uniforms.uBeat2.value = beatValue2;
-    } else {
-      streetMesh.material.uniforms.uBeat.value = 1;
-      gridMesh.material.uniforms.uBeat.value = 1;
-      gridMesh.material.uniforms.uBeat2.value = 0;
-      particlesMesh.material.uniforms.uBeat.value = 1;
-      particlesMesh.material.uniforms.uBeat2.value = 0;
-    } */
   });
   
   useCleanup(() => {
